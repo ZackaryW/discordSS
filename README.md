@@ -1,0 +1,2 @@
+# discordSS
+ discord.py superset
