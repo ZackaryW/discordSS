@@ -1,0 +1,30 @@
+import typing
+
+INTENTS = typing.Literal[
+    "auto_moderation",
+    "auto_moderation_configuration",
+    "auto_moderation_execution",
+    "bans",
+    "dm_messages",
+    "dm_reactions",
+    "dm_typing",
+    "emojis",
+    "emojis_and_stickers",
+    "guild_messages",
+    "guild_reactions",
+    "guild_scheduled_events",
+    "guild_typing",
+    "guilds",
+    "integrations",
+    "invites",
+    "members",
+    "message_content",
+    "messages",
+    "moderation",
+    "presences",
+    "reactions",
+    "typing",
+    "value",
+    "voice_states",
+    "webhooks"
+]

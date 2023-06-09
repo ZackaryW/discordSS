@@ -1,0 +1,6 @@
+[tool.ruff]
+ignore-init-module-imports=true
+
+[tool.ruff.per-file-ignores]
+"discordSS/ext.py" = ["F401"]
+"**/__init__.py" = ["F401"]
