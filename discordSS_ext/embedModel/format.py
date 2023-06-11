@@ -13,6 +13,12 @@ default_cache_method = FOOTER_CACHE()
 CLEAR_FLAG = object()
 
 class EDFMeta(ModelMetaclass):
+    """
+    meta class for EmbedDataFormat
+
+    it handles cache and cache configs
+    """
+
     __instances = {}
     __toggles = {}
     __cache_flags = {}
@@ -89,16 +95,58 @@ class EDFMeta(ModelMetaclass):
         return cls.__instances[cls]
 
 class EmbedDataFormat(BaseModel, metaclass=EDFMeta):
+    """
+    a class that stores and handles formatting of embeds with fstrings
+
+    Example:
+
+    ```python
+    from discordSS_ext.embedModel import ImmutableEmbed, EmbedDataFormat
+
+    embed = ImmutableEmbed(
+        title="template {name}",
+        description="this is a template embed",
+        color=0x00ff00,
+        fields=[
+            {
+                "name": "{fn1}",
+                "value": "{fv1}",
+            }
+        ]
+    )
+
+    class Format1(EmbedDataFormat):
+        model = embed
+        name : str 
+        fn1 : str
+        fv1 : int
+
+
+    embed1 = Format1.formatEmbed(
+        name = "name",
+        fn1 = "field name",
+        fv1 = 123
+    ).toDiscordEmbed()
+
+    ```
+
+    """
+
     model : ImmutableEmbed = None
     
     class Config:
+        # model excluded
         fields = {
             "model" : {
                 "exclude" : True
             }
         }
-
+    
     def format(self, return_immutable : bool = True):
+        """
+        formats model with the data of this instance
+        """
+
         asdict = self.dict(exclude={'model'}, exclude_unset=True)
         newFormatDict = {}
         for varName, baseStr in self.model.iter():
@@ -127,6 +175,10 @@ class EmbedDataFormat(BaseModel, metaclass=EDFMeta):
         embed: typing.Union[discord.Embed, Embed, str],
         return_raw : bool = False
     ):
+        """
+        returns either an instance or dict based on the cache
+        """
+
         if not cls.CACHE_TOGGLE:
             raise ValueError("cache toggle not set")
         if not isinstance(embed, str):
@@ -141,6 +193,10 @@ class EmbedDataFormat(BaseModel, metaclass=EDFMeta):
 
     @classmethod
     def extract(self, embed : typing.Union[discord.Embed, Embed]):
+        """
+        extracts the data from embed fstrings using parse.parse
+        """
+
         if isinstance(embed, discord.Embed):
             embed = ImmutableEmbed.fromDiscordEmbed(embed)
 
@@ -170,6 +226,11 @@ class EmbedDataFormat(BaseModel, metaclass=EDFMeta):
         obj : typing.Union[discord.Embed, Embed, str], 
         return_raw : bool = False
     ):
+        """
+        first tries to retrieve data from cache,
+        if not found, extracts data from fstrings
+        """
+
         trycache = cls.fromCache(obj, return_raw=return_raw)
         if trycache:
             return trycache
@@ -181,6 +242,10 @@ class EmbedDataFormat(BaseModel, metaclass=EDFMeta):
 
     @classmethod
     def formatEmbed(cls, __return_immutable : bool= True, **kwargs):
+        """
+        classmethod that formats the model with the given kwargs
+        """
+
         return cls(**kwargs).format(return_immutable=__return_immutable)
         
     def __hash__(self):
